@@ -49,7 +49,13 @@ main .wrap{padding-block:22px 48px; display:flex; flex-direction:column; gap:18p
 h2{font-family:var(--display); font-weight:700; font-size:clamp(21px,4.6vw,26px); line-height:1.15; margin:0; text-wrap:balance}
 .opts{display:grid; gap:9px}
 .opt{all:unset; box-sizing:border-box; cursor:pointer; display:flex; gap:12px; align-items:flex-start; padding:12px 14px; border:1px solid var(--line); border-radius:10px; background:var(--bg); color:var(--ink); font-size:15.5px; line-height:1.4; transition:border-color .15s, background .15s}
-.opt:hover{border-color:var(--ochre)}
+@media (hover:hover){ .opt:hover{border-color:var(--ochre)} }
+.opts.locked .opt{pointer-events:none}
+.opt.flash{border-color:var(--ochre); background:var(--ochre-soft); animation:flash .32s ease-out}
+.opt.flash .key{background:var(--ochre); border-color:var(--ochre); color:var(--surface)}
+.opts.locked .opt:not(.flash){opacity:.45; transition:opacity .2s}
+@keyframes flash{0%{transform:scale(1)}40%{transform:scale(.98)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){ .opt.flash{animation:none} }
 .opt:focus-visible{outline:2px solid var(--ochre); outline-offset:2px}
 .opt[aria-pressed="true"]{border-color:var(--ochre); background:var(--ochre-soft)}
 .key{flex:none; width:24px; height:24px; border-radius:6px; border:1px solid var(--line); display:grid; place-items:center; font-family:var(--mono); font-size:12px; color:var(--muted); background:var(--surface)}
@@ -101,16 +107,10 @@ legend{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-trans
 .bar-row:first-child .bar i{background:var(--ochre)}
 .pct{font-family:var(--mono); font-size:12px; color:var(--muted); text-align:right; font-variant-numeric:tabular-nums}
 .runner{background:var(--acacia-soft); border-radius:10px; padding:12px 14px; font-size:14.5px}
-.traits{display:flex; flex-direction:column; gap:12px}
-.trait{display:flex; flex-direction:column; gap:4px}
-.trait-labels{display:flex; justify-content:space-between; font-size:13px; color:var(--muted)}
-.trait-labels b{color:var(--ink); font-weight:600}
-.axis{position:relative; height:16px}
-.axis::before{content:""; position:absolute; left:0; right:0; top:7px; height:2px; background:var(--line); border-radius:1px}
-.axis::after{content:""; position:absolute; left:50%; top:3px; width:1px; height:10px; background:var(--line)}
-.dot{position:absolute; top:2px; width:12px; height:12px; border-radius:50%; transform:translateX(-50%)}
-.dot.you{background:var(--ochre); box-shadow:0 0 0 3px var(--ochre-soft); z-index:1}
-.dot.ani{background:transparent; border:2px solid var(--acacia)}
+.radar-wrap{display:flex; justify-content:center}
+.radar{width:100%; max-width:480px; height:auto}
+.stat-line{display:flex; flex-direction:column; gap:2px; font-size:14.5px}
+.stat-line b{font-weight:600}
 .legend{display:flex; gap:16px; font-size:13px; color:var(--muted); flex-wrap:wrap}
 .legend span{display:flex; align-items:center; gap:6px}
 .legend i{width:10px; height:10px; border-radius:50%; display:inline-block}
@@ -510,7 +510,7 @@ Q.forEach(q => q[1].forEach(o => {
 const QMEAN = Q.map(q => { const m = {}; DIMS.forEach(d => m[d] = q[1].reduce((acc, o) => acc + (o[1][d] || 0), 0) / q[1].length); return m; });
 
 const MBTI_TYPES = ["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP","ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP"];
-const MBTI_WEIGHT = 4;      // each MBTI letter counts like four full-strength answers on its trait
+const MBTI_WEIGHT = 1.5;    // at most worth one and a half answers, and only on traits your answers left unclear
 const SHRINK = 2;           // keeps a trait near neutral until several answers point the same way
 const NUDGE = 0.025;        // direct animal nudges are small tie-breakers
 
@@ -525,7 +525,11 @@ function profile(ans, mbti, useMbti = true){
   });
   if (useMbti && mbti && mbti.length === 4) {
     const map = [["S","E","I"],["V","N","S"],["H","F","T"],["O","J","P"]];
-    map.forEach(([d, pos], i) => { s[d] += (mbti[i] === pos ? 1 : -1) * MBTI_WEIGHT; n[d] += MBTI_WEIGHT; });
+    map.forEach(([d, pos], i) => {
+      const clarity = Math.abs(s[d]) / (n[d] + SHRINK);      // 0 = answers undecided, 1 = answers clear-cut
+      const w = MBTI_WEIGHT * (1 - Math.min(1, clarity * 2)); // clear answers leave no room for MBTI
+      s[d] += (mbti[i] === pos ? 1 : -1) * w; n[d] += w;
+    });
   }
   const u = DIMS.map(d => s[d] / (n[d] + SHRINK));
   return {u, nudges};
@@ -583,7 +587,7 @@ function renderIntro(){
         ${MBTI_TYPES.map(t => `<label><input type="radio" name="mbti" id="m-${t}" value="${t}" ${state.mbti === t ? "checked" : ""}>${t}</label>`).join("")}
         <label class="wide"><input type="radio" name="mbti" id="m-none" value="" ${state.mbti === "" ? "checked" : ""}>I don't know / skip</label>
       </div>
-      <p class="small">If you know it, your type is blended in with your answers on four of the eight traits. Your 40 answers still carry most of the weight.</p>
+      <p class="small">Your answers decide your animal. MBTI is only used as a light tie-breaker on traits where your answers were evenly split, and has no effect where they were clear.</p>
     </fieldset>
     <div class="nav"><span class="small" id="hint"></span><button class="btn primary" id="start">${started ? "Continue" : "Start the test"}</button></div>
   </section>
@@ -630,18 +634,55 @@ function renderQuestion(){
       <button class="btn ghost" id="back">Back</button>
       <button class="btn primary" id="next" ${sel == null ? "disabled" : ""}>${state.i === Q.length - 1 ? "See my animal" : "Next"}</button>
     </div></section>`;
-  app.querySelectorAll(".opt").forEach(b => b.onclick = () => { state.ans[state.i] = +b.dataset.j; go(state.i + 1); });
+  const box = app.querySelector(".opts");
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if (box.classList.contains("locked")) return;
+    box.classList.add("locked");
+    app.querySelectorAll(".opt").forEach(o => o.setAttribute("aria-pressed", "false"));
+    b.classList.add("flash");
+    state.ans[state.i] = +b.dataset.j;
+    setTimeout(() => {
+      go(state.i + 1);
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+      if (state.step === "q") app.scrollIntoView({block: "start"});
+    }, 380);
+  });
   document.getElementById("back").onclick = () => go(state.i - 1);
   document.getElementById("next").onclick = () => { if (state.ans[state.i] != null) go(state.i + 1); };
 }
 
-function traitBars(u, p){
-  return `<div class="traits">${DIMS.map((d, i) => {
-    const [lo, hi] = DIM_LABELS[d];
-    const you = 50 + 50 * u[i], ani = 50 + 50 * p[i];
-    return `<div class="trait"><div class="trait-labels"><span ${u[i] < 0 ? 'style="color:var(--ink)"' : ""}>${lo}</span><span ${u[i] > 0 ? 'style="color:var(--ink)"' : ""}>${hi}</span></div>
-      <div class="axis" role="img" aria-label="${lo} to ${hi}: you ${Math.round(u[i] * 100)}"><span class="dot ani" style="left:${ani}%"></span><span class="dot you" style="left:${you}%"></span></div></div>`;
-  }).join("")}</div>`;
+/* Game-style ability radar. Each axis is the trait's high end; the centre is its opposite.
+   Your trait values are stretched for display so a clear lean reads as a high or low stat. */
+const STAT_LABELS = {S:"Social", V:"Vision", H:"Heart", O:"Planning", B:"Bravery", P:"Speed", F:"Playful", L:"Leadership"};
+const statOf = v => Math.round(50 + 50 * Math.max(-1, Math.min(1, v)));
+const youStat = v => statOf(v * 1.8);
+
+function radar(u, p, animalName){
+  const N = DIMS.length, cx = 230, cy = 166, R = 100;
+  const pt = (i, val) => { const ang = -Math.PI / 2 + i * 2 * Math.PI / N; const r = R * val / 100; return [cx + r * Math.cos(ang), cy + r * Math.sin(ang)]; };
+  const poly = vals => vals.map((v, i) => pt(i, v).map(n => n.toFixed(1)).join(",")).join(" ");
+  const you = u.map(youStat), ani = p.map(statOf);
+  const rings = [25, 50, 75, 100].map(v => `<polygon points="${poly(Array(N).fill(v))}" fill="none" stroke="var(--line)" stroke-width="${v === 100 ? 1.5 : 1}" ${v === 50 ? 'stroke-dasharray="3 4"' : ""}/>`).join("");
+  const spokes = DIMS.map((d, i) => { const [x, y] = pt(i, 100); return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--line)" stroke-width="1"/>`; }).join("");
+  const labels = DIMS.map((d, i) => {
+    const [x, y] = pt(i, 122);
+    const anchor = Math.abs(x - cx) < 8 ? "middle" : (x > cx ? "start" : "end");
+    const dy = y < cy - R ? -4 : (y > cy + R ? 12 : 4);
+    return `<text x="${x.toFixed(1)}" y="${(y + dy).toFixed(1)}" text-anchor="${anchor}" font-size="12.5" font-family="var(--body)" fill="var(--muted)">${STAT_LABELS[d]} <tspan font-family="var(--mono)" font-weight="700" fill="var(--ochre)">${you[i]}</tspan></text>`;
+  }).join("");
+  const dots = you.map((v, i) => { const [x, y] = pt(i, v); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="var(--ochre)"/>`; }).join("");
+  const order = DIMS.map((d, i) => [d, you[i]]).sort((a, b) => b[1] - a[1]);
+  const best = order.slice(0, 2).map(([d, v]) => `${STAT_LABELS[d]} ${v}`).join(", ");
+  const low = order[order.length - 1][0];
+  return `<div class="radar-wrap">
+    <svg viewBox="0 0 460 334" class="radar" role="img" aria-label="Your trait chart. ${DIMS.map((d, i) => STAT_LABELS[d] + " " + you[i]).join(", ")}">
+      ${rings}${spokes}
+      <polygon points="${poly(ani)}" fill="var(--acacia)" fill-opacity="0.10" stroke="var(--acacia)" stroke-width="2" stroke-dasharray="5 4"/>
+      <polygon points="${poly(you)}" fill="var(--ochre)" fill-opacity="0.28" stroke="var(--ochre)" stroke-width="2.5" stroke-linejoin="round"/>
+      ${dots}${labels}
+    </svg></div>
+    <div class="stat-line"><span><b>Top stats:</b> ${best}</span><span><b>Lowest:</b> ${STAT_LABELS[low]}, which makes you more ${DIM_LABELS[low][0].toLowerCase()}</span></div>
+    <p class="small">50 is the dashed middle ring. Toward the centre means the opposite trait: solitary, practical, logical, spontaneous, cautious, calm, serious or supportive.</p>`;
 }
 
 function renderResult(){
@@ -652,8 +693,8 @@ function renderResult(){
   if (state.mbti) {
     const without = rank(profile(state.ans, state.mbti, false))[0].k;
     mbtiNote = without === k
-      ? `Your ${state.mbti} type agreed with your answers: you would be the ${nameOf(k)} either way.`
-      : `Your answers alone pointed to the ${nameOf(without)}; blending in your ${state.mbti} type tipped you to the ${nameOf(k)}.`;
+      ? `Your result comes entirely from your answers; your MBTI type didn't change it.`
+      : `Your answers put the ${nameOf(without)} and the ${nameOf(k)} almost level. Your MBTI type was used as a tie-breaker on traits where your answers were evenly split.`;
   }
   const share = `My savanna spirit animal is the ${nameOf(k)} (${a.sw}): ${pick(a.tag).toLowerCase()}. ${pctOf(r[0].fit)}% match. Runner-up: ${nameOf(k2)}.`;
   app.innerHTML = `<section class="card result">
@@ -673,15 +714,15 @@ function renderResult(){
     <div class="runner"><b>Runner-up: ${esc(nameOf(k2))} (${b.sw})</b>, ${pick(b.tag).toLowerCase()}. ${esc(pick(b.desc).split(". ")[0])}.</div>
   </section>
   <section class="card">
-    <h2>Your trait profile</h2>
-    <div class="legend"><span><i style="background:var(--ochre)"></i>You</span><span><i style="border:2px solid var(--acacia)"></i>${esc(nameOf(k))}</span></div>
-    ${traitBars(prof.u, a.p)}
+    <h2>Your Trait</h2>
+    <div class="legend"><span><i style="background:var(--ochre)"></i>You</span><span><i style="border:2px dashed var(--acacia)"></i>${esc(nameOf(k))}</span></div>
+    ${radar(prof.u, a.p, nameOf(k))}
   </section>
   <section class="card">
-    <h2>Your top five</h2>
-    <div class="bars">${r.slice(0, 5).map(x => `<div class="bar-row"><span>${esc(nameOf(x.k))}</span><div class="bar"><i style="width:${pctOf(x.fit)}%"></i></div><span class="pct">${pctOf(x.fit)}%</span></div>`).join("")}</div>
+    <h2>Your top three</h2>
+    <div class="bars">${r.slice(0, 3).map(x => `<div class="bar-row"><span>${esc(nameOf(x.k))}</span><div class="bar"><i style="width:${pctOf(x.fit)}%"></i></div><span class="pct">${pctOf(x.fit)}%</span></div>`).join("")}</div>
     <details><summary>How the match works</summary>
-      <p>Every answer moves you along eight personality traits, measured against the average of the five options so no trait is favoured by how the questions are written. Each animal has its own profile on the same eight traits, based on how it actually lives: herd or solitary, sprinter or ambusher, leader or team player. Your match blends how similar the overall shape of your profile is to each animal's with how close the individual traits are. A few answers, like loving water or wanting super speed, give a small extra nudge to specific animals. The scoring is calibrated so all sixteen animals are equally likely outcomes. If you gave an MBTI type, it is added as extra evidence on the Social, Visionary, Heart and Planner traits.</p>
+      <p>Every answer moves you along eight personality traits, measured against the average of the five options so no trait is favoured by how the questions are written. Each animal has its own profile on the same eight traits, based on how it actually lives: herd or solitary, sprinter or ambusher, leader or team player. Your match blends how similar the overall shape of your profile is to each animal's with how close the individual traits are. A few answers, like loving water or wanting super speed, give a small extra nudge to specific animals. The scoring is calibrated so all sixteen animals are equally likely outcomes. If you gave an MBTI type, it only acts as a light tie-breaker on the Social, Visionary, Heart and Planner traits, and only where your own answers were evenly split. There is no fixed link between any MBTI type and any animal.</p>
     </details>
   </section>
   <section class="card">
