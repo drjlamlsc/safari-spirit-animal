@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>Savanna Spirit Animal</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one centred field-card column; a dusk band at top, one question per view, a tracker line for progress */
+:root{
+  --bg:#eef0ea; --surface:#fbfcf8; --ink:#1c241f; --muted:#5b665e; --line:#d3d8cc;
+  --ochre:#b8731d; --ochre-soft:#f3e3c8; --acacia:#3d5a3a; --acacia-soft:#dfe8da;
+  --band1:#2e3d33; --band2:#7b5a2e; --on-band:#f4f1e6;
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body:"Figtree", "Helvetica Neue", Arial, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121814; --surface:#1a221d; --ink:#e9ece3; --muted:#a3ada4; --line:#2e3a32;
+  --ochre:#e3a14a; --ochre-soft:#3a2c17; --acacia:#9bc08f; --acacia-soft:#223024;
+  --band1:#1e2a22; --band2:#4a3519; --on-band:#efe9d9; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#121814; --surface:#1a221d; --ink:#e9ece3; --muted:#a3ada4; --line:#2e3a32;
+  --ochre:#e3a14a; --ochre-soft:#3a2c17; --acacia:#9bc08f; --acacia-soft:#223024;
+  --band1:#1e2a22; --band2:#4a3519; --on-band:#efe9d9; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.5}
+.band{background:linear-gradient(160deg,var(--band1) 0%,var(--band1) 55%,var(--band2) 100%); color:var(--on-band)}
+.wrap{max-width:640px; margin:0 auto; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.band .wrap{padding-block:28px 22px; display:flex; flex-direction:column; gap:6px}
+.eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; opacity:.8}
+h1{font-family:var(--display); font-weight:800; font-size:clamp(30px,7vw,44px); line-height:1.02; margin:0; text-wrap:balance; letter-spacing:-.01em}
+.band p{margin:0; opacity:.86; max-width:46ch}
+main .wrap{padding-block:22px 48px; display:flex; flex-direction:column; gap:18px}
+
+.tracker{display:flex; flex-direction:column; gap:8px}
+.track-row{display:flex; justify-content:space-between; font-family:var(--mono); font-size:12px; color:var(--muted)}
+.track{position:relative; height:10px}
+.track::before{content:""; position:absolute; left:0; right:0; top:4px; border-top:2px dashed var(--line)}
+.trail{position:absolute; left:0; top:4px; height:2px; background:var(--ochre); transition:width .35s ease}
+.paw{position:absolute; top:-1px; width:12px; height:12px; border-radius:50%; background:var(--ochre); transform:translateX(-50%); transition:left .35s ease; box-shadow:0 0 0 4px var(--ochre-soft)}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:16px}
+.qnum{font-family:var(--mono); font-size:12px; color:var(--ochre); letter-spacing:.08em}
+h2{font-family:var(--display); font-weight:700; font-size:clamp(21px,4.6vw,26px); line-height:1.15; margin:0; text-wrap:balance}
+.opts{display:grid; gap:9px}
+.opt{all:unset; box-sizing:border-box; cursor:pointer; display:flex; gap:12px; align-items:flex-start; padding:12px 14px; border:1px solid var(--line); border-radius:10px; background:var(--bg); color:var(--ink); font-size:15.5px; line-height:1.4; transition:border-color .15s, background .15s}
+.opt:hover{border-color:var(--ochre)}
+.opt:focus-visible{outline:2px solid var(--ochre); outline-offset:2px}
+.opt[aria-pressed="true"]{border-color:var(--ochre); background:var(--ochre-soft)}
+.key{flex:none; width:24px; height:24px; border-radius:6px; border:1px solid var(--line); display:grid; place-items:center; font-family:var(--mono); font-size:12px; color:var(--muted); background:var(--surface)}
+.opt[aria-pressed="true"] .key{background:var(--ochre); border-color:var(--ochre); color:var(--surface)}
+.nav{display:flex; justify-content:space-between; gap:10px; align-items:center}
+.btn{all:unset; box-sizing:border-box; cursor:pointer; padding:11px 18px; border-radius:999px; font-weight:600; font-size:15px; text-align:center}
+.btn:focus-visible{outline:2px solid var(--ochre); outline-offset:2px}
+.btn.primary{background:var(--acacia); color:var(--surface)}
+.btn.ghost{color:var(--muted); border:1px solid var(--line)}
+.btn[disabled]{opacity:.4; cursor:default}
+
+/* setup */
+fieldset{border:0; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; min-width:0}
+legend{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); padding:0; margin-bottom:8px}
+.seg{display:flex; flex-wrap:wrap; gap:8px}
+.seg label{display:flex; align-items:center; gap:8px; padding:10px 14px; border:1px solid var(--line); border-radius:999px; cursor:pointer; background:var(--bg); font-size:15px}
+.seg input{accent-color:var(--ochre); margin:0}
+.seg label:has(input:checked){border-color:var(--ochre); background:var(--ochre-soft)}
+.seg label:has(input:focus-visible){outline:2px solid var(--ochre); outline-offset:2px}
+.mbti-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:6px}
+.mbti-grid label{display:grid; place-items:center; padding:9px 0; border:1px solid var(--line); border-radius:8px; cursor:pointer; background:var(--bg); font-family:var(--mono); font-size:13px}
+.mbti-grid input{position:absolute; opacity:0; pointer-events:none}
+.mbti-grid label:has(input:checked){border-color:var(--ochre); background:var(--ochre-soft); color:var(--ink)}
+.mbti-grid label:has(input:focus-visible){outline:2px solid var(--ochre); outline-offset:2px}
+.mbti-grid .wide{grid-column:1 / -1; font-family:var(--body); font-size:14.5px}
+.intro-list{display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:8px; margin:0; padding:0; list-style:none}
+.intro-list li{font-size:14px; padding:8px 10px; border-radius:8px; background:var(--acacia-soft); display:flex; flex-direction:column}
+.intro-list b{font-weight:600}
+.intro-list span{font-family:var(--mono); font-size:11px; color:var(--muted)}
+.small{font-size:13.5px; color:var(--muted); margin:0}
+
+/* result */
+.result-head{display:flex; flex-direction:column; gap:4px}
+.big-animal{font-family:var(--display); font-weight:800; font-size:clamp(38px,10vw,60px); line-height:.95; letter-spacing:-.02em; color:var(--ochre); margin:0; text-wrap:balance}
+.sw{font-family:var(--mono); font-size:13px; color:var(--muted)}
+.tagline{font-family:var(--display); font-weight:600; font-size:19px; margin:0}
+.result p{margin:0}
+.cols{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+@media (max-width:520px){ .cols{grid-template-columns:1fr} }
+.cols h3, .sub{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:0 0 6px; font-weight:500}
+.cols ul{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:3px}
+.meet{border-top:1px dashed var(--line); padding-top:12px; font-size:14.5px}
+.meet b{color:var(--acacia)}
+.bars{display:flex; flex-direction:column; gap:8px}
+.bar-row{display:grid; grid-template-columns:130px 1fr 44px; gap:10px; align-items:center; font-size:14px}
+.bar-row span:first-child{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.bar{height:8px; border-radius:4px; background:var(--line); overflow:hidden}
+.bar i{display:block; height:100%; background:var(--acacia); border-radius:4px}
+.bar-row:first-child .bar i{background:var(--ochre)}
+.pct{font-family:var(--mono); font-size:12px; color:var(--muted); text-align:right; font-variant-numeric:tabular-nums}
+.runner{background:var(--acacia-soft); border-radius:10px; padding:12px 14px; font-size:14.5px}
+.traits{display:flex; flex-direction:column; gap:12px}
+.trait{display:flex; flex-direction:column; gap:4px}
+.trait-labels{display:flex; justify-content:space-between; font-size:13px; color:var(--muted)}
+.trait-labels b{color:var(--ink); font-weight:600}
+.axis{position:relative; height:16px}
+.axis::before{content:""; position:absolute; left:0; right:0; top:7px; height:2px; background:var(--line); border-radius:1px}
+.axis::after{content:""; position:absolute; left:50%; top:3px; width:1px; height:10px; background:var(--line)}
+.dot{position:absolute; top:2px; width:12px; height:12px; border-radius:50%; transform:translateX(-50%)}
+.dot.you{background:var(--ochre); box-shadow:0 0 0 3px var(--ochre-soft); z-index:1}
+.dot.ani{background:transparent; border:2px solid var(--acacia)}
+.legend{display:flex; gap:16px; font-size:13px; color:var(--muted); flex-wrap:wrap}
+.legend span{display:flex; align-items:center; gap:6px}
+.legend i{width:10px; height:10px; border-radius:50%; display:inline-block}
+.mbti-note{font-size:14px; color:var(--muted); border-left:3px solid var(--ochre); padding-left:10px}
+.share-text{width:100%; min-height:90px; font:inherit; font-size:13.5px; padding:10px; border-radius:8px; border:1px solid var(--line); background:var(--bg); color:var(--ink); resize:vertical}
+.actions{display:flex; gap:10px; flex-wrap:wrap}
+details{font-size:14px}
+details summary{cursor:pointer; color:var(--acacia); font-weight:600}
+details p{margin:8px 0 0; color:var(--muted)}
+@media (prefers-reduced-motion: reduce){ .trail,.paw,.opt{transition:none} }
+</style>
+
+<header class="band">
+  <div class="wrap">
+    <div class="eyebrow">Safari personality field test · 40 questions</div>
+    <h1>Which African animal are you?</h1>
+    <p>Answer on instinct. Sixteen animals of the Kenyan bush are matched against your personality profile, and your closest match is revealed at the end.</p>
+  </div>
+</header>
+
+<main>
+  <div class="wrap" id="app"></div>
+</main>
+
+<script>
+/* ---------- Trait model ----------
+   Eight bipolar traits, each from -1 to +1:
+   S social(+) / solitary(-)      V visionary(+) / practical(-)
+   H heart(+) / logic(-)          O planner(+) / spontaneous(-)
+   B bold(+) / cautious(-)        P fast(+) / calm(-)
+   F playful(+) / serious(-)      L leader(+) / supporter(-)          */
+const DIMS = ["S","V","H","O","B","P","F","L"];
+const DIM_LABELS = {
+  S:["Solitary","Social"], V:["Practical","Visionary"], H:["Logic","Heart"], O:["Spontaneous","Planner"],
+  B:["Cautious","Bold"], P:["Calm","Fast"], F:["Serious","Playful"], L:["Supporter","Leader"]
+};
+
+const A = {
+  elephant:{sw:"Tembo", p:[.5,.4,1,.5,.1,-.5,0,.5],
+    name:{m:"Bull Elephant", f:"Matriarch Elephant", x:"Elephant"},
+    tag:{m:"The gentle giant", f:"The wise heart of the herd", x:"The wise heart of the herd"},
+    desc:{m:"Calm, wise and quietly powerful. Bull elephants roam more independently but stay connected to the herd and mentor the young. You carry real authority, a long memory and a kind heart under a formidable exterior.",
+          f:"You lead with empathy and memory. Matriarchs guide the whole family through hard years because they remember where the water is. People bring you their problems because you listen properly and protect the vulnerable without fuss.",
+          x:"You lead with empathy and memory. People bring you their problems because you listen properly, remember what matters to them, and protect the vulnerable without making a fuss about it."},
+    good:["Deeply loyal to family and friends","Remembers details others forget","Calm authority in a crisis"],
+    watch:["Carries everyone's weight","Slow to forgive a real betrayal"],
+    meet:"Amboseli, with Kilimanjaro behind the herds, or the red-dust giants of Tsavo."},
+  lion:{sw:"Simba", p:[.7,-.1,0,.1,.8,-.2,.1,1],
+    name:{m:"Lion", f:"Lioness", x:"Lion"},
+    tag:{m:"The natural leader", f:"The heart of the hunt", x:"The natural leader"},
+    desc:{m:"Confident, warm with your own people and comfortable taking charge. You are happiest at the centre of a close crew, and you know the value of a long rest between big efforts.",
+          f:"Strategic, loyal and quietly in charge. Lionesses do most of the hunting and raise the cubs together, holding the pride together. You lead through competence and teamwork rather than noise.",
+          x:"Confident, warm with your own people and comfortable taking charge. You are happiest at the centre of a close crew, and you know the value of a long rest between big efforts."},
+    good:["Decisive under pressure","Fiercely loyal to your pride","Makes others feel safe"],
+    watch:["Likes being the one in charge a little too much","Can coast until it really matters"],
+    meet:"The Maasai Mara, one of the best lion territories in Africa."},
+  leopard:{sw:"Chui", p:[-1,.3,-.3,-.3,.4,0,-.1,0],
+    name:"Leopard", tag:"The adaptable free spirit",
+    desc:"Independent, curious and quietly capable. You thrive in almost any setting, pick up new skills on your own, and prefer to solve things yourself rather than wait for permission.",
+    good:["Endlessly adaptable","Self-taught and resourceful","Calm and private"],
+    watch:["Can be hard to read","Takes on too much alone"],
+    meet:"The riverine trees of the Maasai Mara or Samburu, if you look up into the branches."},
+  rhino:{sw:"Kifaru", p:[-.7,-.5,-.4,.6,.9,-.2,-.6,.3],
+    name:"Rhino", tag:"The unstoppable one",
+    desc:"Determined, principled and steady. Once you set a direction you keep going, and you guard your boundaries clearly. People always know where they stand with you.",
+    good:["Persistent and reliable","Strong personal values","Unfazed by criticism"],
+    watch:["Stubborn when you dig in","Can charge before looking"],
+    meet:"Lake Nakuru or Ol Pejeta Conservancy, home of the last two northern white rhinos."},
+  buffalo:{sw:"Nyati", p:[.6,-.6,.4,.5,.7,-.1,-.3,-.5],
+    name:"Cape Buffalo", tag:"The loyal defender",
+    desc:"Brave, steady and team-minded. You do not need credit; you need your people to be safe. When someone in your circle is threatened, you are the first to turn and face it.",
+    good:["Unshakeable solidarity","Courage on behalf of others","Stamina for the long haul"],
+    watch:["Grumpy when pushed too far","Distrustful of outsiders at first"],
+    meet:"Almost every Kenyan park, often with oxpecker birds riding on top."},
+  cheetah:{sw:"Duma", p:[-.4,-.2,.1,.7,.1,1,-.2,0],
+    name:"Cheetah", tag:"The focused sprinter",
+    desc:"Fast, precise and goal-driven. You work in intense bursts, aim for excellence and move before others have finished thinking. Underneath the speed you are gentler than people expect.",
+    good:["Laser focus","High standards","Quick decisions"],
+    watch:["Burns out after big pushes","Hard on yourself"],
+    meet:"The open plains of the Mara, sitting tall on a termite mound."},
+  giraffe:{sw:"Twiga", p:[0,1,.6,.1,-.6,-.7,0,.1],
+    name:"Giraffe", tag:"The calm visionary",
+    desc:"You see further than most and rarely panic. You think in long timelines, keep your head above the noise, and bring a gentle, peaceful presence to any group.",
+    good:["Big-picture thinking","Unflappable","Kind and non-judgemental"],
+    watch:["Can seem distant","May avoid necessary conflict"],
+    meet:"Maasai giraffe in the Mara, reticulated giraffe in Samburu, Rothschild's at Lake Nakuru."},
+  zebra:{sw:"Punda milia", p:[.7,.2,.2,-.8,-.1,.3,.7,-.2],
+    name:"Zebra", tag:"The original in the crowd",
+    desc:"Sociable but unmistakably yourself. You love being part of the group and still bring your own style to everything. Playful, spontaneous and good at keeping the mood light.",
+    good:["Distinctive personal style","Great company","Comfortable with change"],
+    watch:["Easily bored by routine","Avoids planning"],
+    meet:"Everywhere in the Mara, usually mixed in with the wildebeest."},
+  hippo:{sw:"Kiboko", p:[.1,-.4,-.1,-.3,.6,-1,.2,.2],
+    name:"Hippo", tag:"The laid-back powerhouse",
+    desc:"Relaxed, comfort-loving and much stronger than you look. You value your downtime and your space, and you rarely raise your voice, but nobody who has seen you defend your territory forgets it.",
+    good:["Calm and easy-going","Knows how to recharge","Formidable when it counts"],
+    watch:["Territorial about your space","Can be too comfortable"],
+    meet:"The Mara River, Lake Naivasha by boat, or Mzima Springs in Tsavo West."},
+  hyena:{sw:"Fisi", p:[.5,.5,-.5,0,.3,.2,.8,.2],
+    name:{m:"Spotted Hyena", f:"Hyena Matriarch", x:"Spotted Hyena"},
+    tag:{m:"The underestimated strategist", f:"The underestimated queen", x:"The underestimated strategist"},
+    desc:{m:"Clever, funny and far more capable than people assume. You read situations quickly, find the angle others miss, and turn unpromising resources into a win.",
+          f:"Clever, funny and far more capable than people assume. In spotted hyena clans the females lead and outrank the males. You read situations quickly, find the angle others miss, and turn unpromising resources into a win.",
+          x:"Clever, funny and far more capable than people assume. You read situations quickly, find the angle others miss, and turn unpromising resources into a win."},
+    good:["Sharp strategic mind","Great sense of humour","Resourceful and resilient"],
+    watch:["Can come across as cynical","Plays your cards close"],
+    meet:"Den sites in the Mara at dawn, or by the night-time whooping calls."},
+  baboon:{sw:"Nyani", p:[.7,.5,-.1,-.8,.2,.6,.9,0],
+    name:"Baboon", tag:"The curious problem-solver",
+    desc:"Inquisitive, sociable and endlessly inventive. You have five projects on the go, take things apart to see how they work, and bring energy and mischief to any room.",
+    good:["Creative problem-solving","Curious about everything","Socially quick"],
+    watch:["Too many projects at once","Restless when bored"],
+    meet:"Lake Nakuru's Baboon Cliff, or raiding a careless lodge breakfast."},
+  flamingo:{sw:"Heroe", p:[1,.2,.7,.3,-.6,-.1,.3,-.5],
+    name:"Flamingo", tag:"The graceful social butterfly",
+    desc:"Expressive, harmonious and drawn to beauty. You come alive in a group that moves together, care about how things look and feel, and make gatherings more colourful.",
+    good:["Brings people together","Strong aesthetic sense","Graceful under pressure"],
+    watch:["Sensitive to group mood","Needs your flock"],
+    meet:"Lake Bogoria or Lake Nakuru, depending on the season's water levels."},
+  wildebeest:{sw:"Nyumbu", p:[.9,-.6,.4,.2,.1,.2,.2,-1],
+    name:"Wildebeest", tag:"The resilient journeyer",
+    desc:"You keep moving forward with your people, through drought, rivers and whatever else the year throws at you. Easy-going, sociable and much tougher than your goofy exterior suggests.",
+    good:["Resilient through hard seasons","Loyal to the group","Adapts to change"],
+    watch:["Can follow the herd without asking why","Restless when stuck in one place"],
+    meet:"The Maasai Mara during the Great Migration, usually around July to October."},
+  crocodile:{sw:"Mamba", p:[-.6,.3,-.8,.7,.3,-.9,-.5,.3],
+    name:"Nile Crocodile", tag:"The patient tactician",
+    desc:"Calm, unhurried and quietly formidable. You can wait a very long time for the right moment, and when it comes you act decisively. Little rattles you.",
+    good:["Extraordinary patience","Cool under pressure","Acts at exactly the right time"],
+    watch:["Can seem cold","Slow to show your hand, even to friends"],
+    meet:"Basking on the sandbanks of the Mara River or Tsavo's Galana River."},
+  chimpanzee:{sw:"Sokwe", p:[.8,.8,.3,-.2,.2,.4,.5,.6],
+    name:"Chimpanzee", tag:"The clever social strategist",
+    desc:"Smart, expressive and socially sharp. You read people well, solve problems with whatever tools are at hand and build strong alliances.",
+    good:["Inventive with tools and ideas","Emotionally perceptive","Builds strong alliances"],
+    watch:["Gets caught up in group politics","Big feelings, quickly shown"],
+    meet:"Kenya has no wild chimps, but Sweetwaters Chimpanzee Sanctuary at Ol Pejeta cares for rescued ones."},
+  wilddog:{sw:"Mbwa mwitu", p:[.9,-.2,.8,.7,.4,.8,.2,-.6],
+    name:"African Wild Dog", tag:"The ultimate team player",
+    desc:"You believe the team wins or nobody does. You share generously, look after the weakest member of the group and have the stamina to keep going long after others quit.",
+    good:["Generous and cooperative","Huge stamina","Looks after everyone"],
+    watch:["Struggles to work alone","Spends energy on others first"],
+    meet:"Laikipia, one of the best places left in Kenya for these rare painted wolves."}
+};
+
+/* Each option: [text, trait loadings, optional direct nudges to specific animals] */
+const Q = [
+ ["It's a free Saturday with no plans. You:", [
+  ["Rally a big group for an outing","S1 L.5"],
+  ["Go and explore somewhere new on your own","S-1 V.5 B.3"],
+  ["Have a long lazy swim, spa or nap","P-1 O-.3",{hippo:1}],
+  ["Check in on family or help a friend","H1 S.3 L-.5"],
+  ["Finally clear my to-do list","O1 P.5"]]],
+ ["In a group project you're usually the one who:", [
+  ["Takes charge and sets direction","L1 B.5"],
+  ["Keeps everyone on good terms","H1 L-.5 S.5"],
+  ["Comes up with the big idea","V1 L.3"],
+  ["Quietly does their part extremely well","S-1 O.5"],
+  ["Keeps the energy up and makes it fun","F1 S.5"]]],
+ ["Your friends would most likely describe you as:", [
+  ["Funny","F1 S.5"],
+  ["Dependable","O.7 H.3 F-.3 V-.3"],
+  ["Original","V.6 O-.6 F.3"],
+  ["Calm and wise","P-1 V.5 H.3"],
+  ["Fearless","B1 L.3"]]],
+ ["When a conflict comes up, you:", [
+  ["Face it head on","B1 H-.3"],
+  ["Defuse it with humour","F1 B-.3 H.3"],
+  ["Listen to every side first","H1 B-.3 P-.3"],
+  ["Wait for exactly the right moment","P-1 B-.3 O.3",{crocodile:.5}],
+  ["Quietly line up allies","S1 L.5",{chimpanzee:.5}]]],
+ ["Your natural working rhythm is:", [
+  ["Intense bursts, then a proper rest","P1 O-.3",{cheetah:.5,lion:.5}],
+  ["Slow, steady and relentless","P-.7 O.7"],
+  ["Juggling several things at once","O-1 P.5 V.3"],
+  ["Moving in step with a team","S1 L-1"],
+  ["Long stretches of deep focus alone","S-1 V.3 O.3"]]],
+ ["Pick a dream holiday:", [
+  ["An adventurous solo trek","S-1 B.7"],
+  ["A beach resort with nothing to do","P-1 F.3",{hippo:.5}],
+  ["A festival or big city with friends","S1 F.7 O-.3"],
+  ["A slow scenic road trip with long views","P-.7 V.7"],
+  ["A carefully planned cultural tour","O1 V.3"]]],
+ ["Someone you love is threatened. You:", [
+  ["Charge straight in","B1 P.5"],
+  ["Mobilise everyone who can help","S.7 H.5 L.3"],
+  ["Stand tall and make it clear this stops now","L1 B.7"],
+  ["Work out the smartest move first","H-.5 V.5 P-.3"],
+  ["Comfort them first, deal with the threat later","H1 B-.5"]]],
+ ["How do you like to learn something new?", [
+  ["Teach myself from the internet at midnight","S-1 O-.5 V.5"],
+  ["Drill one skill until it's perfect","O1 V-.5"],
+  ["Take a class with friends","S1 H.3"],
+  ["Learn from a mentor","H.5 O.5 L-.5"],
+  ["Experiment and break things","F.5 O-1 B.3"]]],
+ ["Your everyday energy level is:", [
+  ["High-octane, always moving","P1"],
+  ["Calm and unhurried","P-1"],
+  ["Steady stamina from morning to night","P.3 O.7"],
+  ["Mostly chilled, explosive when needed","P-.5 B.7"],
+  ["Up and down with my mood","H.5 O-.7"]]],
+ ["How do you recharge?", [
+  ["Time completely alone","S-1"],
+  ["A few very close people","S-.3 H.7"],
+  ["The bigger the crowd, the better","S1 F.5"],
+  ["Out with my crew","S.7 L-.5",{wilddog:.5}],
+  ["Outdoors, in nature","S-.5 V.5 P-.3"]]],
+ ["Which compliment means the most to you?", [
+  ["\"You're so brave.\"","B1"],
+  ["\"You're so clever.\"","V1 H-.3"],
+  ["\"You're so kind.\"","H1"],
+  ["\"You're so elegant.\"","O.3 F-.3",{flamingo:.7,cheetah:.5}],
+  ["\"You're so much fun.\"","F1 S.5"]]],
+ ["Under real pressure you tend to:", [
+  ["Speed up and sprint for the finish","P1 B.3"],
+  ["Dig in and push through","B.7 O.5 P-.3"],
+  ["Go very still and wait","P-1 H-.5",{crocodile:.5}],
+  ["Improvise","O-1 V.5"],
+  ["Lean on the team","S1 L-.7"]]],
+ ["Your home is best described as:", [
+  ["Cosy, with the best bed in town","P-1 F.3"],
+  ["Minimal and functional","O1 S-.3"],
+  ["Full of gadgets and half-finished projects","V.5 O-1"],
+  ["Bold colours and carefully chosen pieces","V.3 H.3",{flamingo:.5,zebra:.5}],
+  ["Always full of guests","S1 H.5"]]],
+ ["Your relationship with rules:", [
+  ["I make my own","O-1 S-.5 L.3"],
+  ["I follow them; they keep people safe","O1 L-.5"],
+  ["I bend them cleverly","V.5 F.5 O-.5",{hyena:.3,chimpanzee:.3}],
+  ["I'm usually the one setting them","L1 O.5"],
+  ["I ignore them unless someone could get hurt","H.5 O-.7"]]],
+ ["Your sense of humour is:", [
+  ["Dry and deadpan","F.3 H-.5 S-.5"],
+  ["A loud, contagious laugh","F1 S.7"],
+  ["Pranks and mischief","F1 O-.5"],
+  ["Warm and gentle","H.7 F.3"],
+  ["Honestly, I'm the serious one","F-1"]]],
+ ["Planning a trip, you:", [
+  ["Build a detailed itinerary","O1"],
+  ["Wing it","O-1"],
+  ["Go wherever the group is going","S.7 L-1"],
+  ["Research the hidden gems","V.7 S-.3"],
+  ["Organise it for everyone","L1 O.5 H.3"]]],
+ ["Big decisions: how do you make them?", [
+  ["Fast, on gut instinct","P1 O-.5"],
+  ["Slowly, with the long view in mind","P-1 V.5"],
+  ["Talk it through with my people","S1 H.5"],
+  ["Gather information and weigh it quietly","S-.7 H-.5"],
+  ["Whatever feels right for everyone involved","H1"]]],
+ ["Be honest: your biggest weakness is:", [
+  ["Stubbornness","B.7 O.5"],
+  ["Burning out after a big push","P1"],
+  ["Too many projects at once","O-1 V.5"],
+  ["Enjoying the spotlight","L1 S.5"],
+  ["Being too cautious","B-1"]]],
+ ["Water, for you, is:", [
+  ["Where I'd happily spend all day","P-1",{hippo:1,crocodile:.7}],
+  ["Best for wading and looking good","S.3",{flamingo:1}],
+  ["Something I'll cross bravely when I have to","B.5 S.5",{wildebeest:1}],
+  ["Strictly for drinking","P.5",{giraffe:.5,cheetah:.5}],
+  ["Just another place to explore","V.5 O-.5",{baboon:.5,chimpanzee:.5}]]],
+ ["What would you most like to leave behind?", [
+  ["A strong, close family or community","H1 S.5"],
+  ["An organisation I built and led","L1"],
+  ["Something beautiful and original","V.7 O-.3"],
+  ["Wisdom passed on","V.5 P-.5 H.3"],
+  ["A team that won together","S.7 L-.7"]]],
+ ["At a party full of strangers you:", [
+  ["Work the room","S1 F.5"],
+  ["Find the one interesting person","S-.5 V.5"],
+  ["Stick close to my friends","S.5 L-.5 B-.5"],
+  ["Watch from the edge","S-1 B-.3"],
+  ["Help the host","H1 O.5"]]],
+ ["Stuck in a long, dull meeting, you:", [
+  ["Take over and speed it up","L1 P.5"],
+  ["Doodle ideas","V1 O-.5"],
+  ["Crack a joke","F1"],
+  ["Wait it out patiently","P-1 O.5"],
+  ["Make sure everyone's been heard","H1 S.3"]]],
+ ["Your approach to money:", [
+  ["Save carefully with a plan","O1 B-.3"],
+  ["Spend on experiences","O-.7 F.5"],
+  ["Invest boldly","B1 V.5"],
+  ["Spend it on people I love","H1"],
+  ["I don't think about it much","O-1 P-.3"]]],
+ ["When someone criticises you:", [
+  ["I shrug it off","B.7 H-.5"],
+  ["I take it to heart","H1 B-.5"],
+  ["I analyse whether they're right","V.5 H-.5"],
+  ["I push back","B1 P.5"],
+  ["I laugh it off","F1"]]],
+ ["Your ideal role in a crisis:", [
+  ["Commander","L1 B.5"],
+  ["Carer","H1"],
+  ["Strategist","V1 P-.3"],
+  ["First responder","P1 B.7"],
+  ["Morale officer","F.7 S.7"]]],
+ ["Choose a superpower:", [
+  ["Super speed","P1",{cheetah:1}],
+  ["Reading minds","H.7 V.5"],
+  ["Invisibility","S-1",{leopard:.7}],
+  ["Invulnerability","B1",{rhino:.5,buffalo:.3}],
+  ["Perfect memory","O.5 V.3",{elephant:1}]]],
+ ["Big change is coming. You:", [
+  ["Love it","O-1 V.5"],
+  ["Are fine if we move together","S1 L-.5",{wildebeest:.5}],
+  ["Resist it","O1 B.3 V-.5"],
+  ["Adapt quietly","S-.5 P-.3"],
+  ["Lead it","L1 V.5"]]],
+ ["When are you at your best?", [
+  ["Up at dawn with a plan","O1 P.5"],
+  ["Late at night","O-.5 S-.5",{leopard:.5}],
+  ["Any time; I'm flexible","O-.7"],
+  ["Mornings, after a slow start","P-.7"],
+  ["Golden hour, with people around","S.7 F.3"]]],
+ ["Your position in a team sport:", [
+  ["Captain","L1"],
+  ["Striker","P1 B.5"],
+  ["Defender","B.5 L-.5 H.3",{buffalo:.5}],
+  ["Playmaker","V.7 S.5"],
+  ["I'd rather do a solo sport","S-1"]]],
+ ["You have hard news to deliver. You:", [
+  ["Say it directly and quickly","H-.5 B.5 P.5"],
+  ["Say it gently and carefully","H1 P-.3"],
+  ["Soften it with a little humour","F.7 H.3"],
+  ["Put it in writing, clearly structured","O1 S-.5"],
+  ["Hope someone else does it","B-1 L-.5"]]],
+ ["Your phone's home screen is:", [
+  ["Neat folders, everything in place","O1"],
+  ["Hundreds of unread notifications","O-1"],
+  ["Mostly group chats","S1"],
+  ["Barely used","S-.7 P-.3"],
+  ["Packed with apps for hobbies and projects","V.7 O-.3"]]],
+ ["How do you feel about competition?", [
+  ["I play to win","B.7 L.7"],
+  ["Love it, win or lose","F.7 S.5"],
+  ["I'd rather cooperate","H.7 L-.7"],
+  ["I only compete with myself","S-1 O.5"],
+  ["I win by outsmarting people","V.7 H-.3"]]],
+ ["A friend is upset. You:", [
+  ["Sit with them and listen","H1 P-.5"],
+  ["Help fix the problem","O.5 H-.3 L.3"],
+  ["Cheer them up with something fun","F1 S.5"],
+  ["Gather friends around them","S1 H.5"],
+  ["Give them space","S-1"]]],
+ ["Pick a landscape:", [
+  ["Wide open plains","P.5 S.3"],
+  ["The edge of a forest","S-1 V.3"],
+  ["A slow river","P-.5",{hippo:.5,crocodile:.5}],
+  ["A busy waterhole","S1 F.3"],
+  ["A high lookout","V1 P-.3",{giraffe:.5}]]],
+ ["How do you show love?", [
+  ["By protecting them","B.7 L.3"],
+  ["With quality time","H.7 P-.5"],
+  ["By doing things for them","O.5 H.5 L-.3"],
+  ["With fun and adventures","F.7 P.5"],
+  ["With thoughtful ideas and surprises","V.7 H.3"]]],
+ ["Your attitude to risk:", [
+  ["Bring it on","B1 O-.3"],
+  ["Calculated risks only","O.7 V.3"],
+  ["I avoid it","B-1"],
+  ["Only with backup","S.7 B.3 L-.3"],
+  ["Depends on my mood","O-.7 F.3"]]],
+ ["The way you talk is:", [
+  ["Fast","P1"],
+  ["Slow and measured","P-1 O.3"],
+  ["Few words","S-1 F-.3"],
+  ["Loud and expressive","S.7 F.7"],
+  ["Warm storytelling","H.5 V.5"]]],
+ ["What drives you most?", [
+  ["Getting to the top","L1 B.5"],
+  ["Mastering a craft","O.7 S-.5"],
+  ["Freedom","O-1 S-.3"],
+  ["Harmony","H1 B-.3"],
+  ["Adventure","P.7 B.5 V.3"]]],
+ ["People's first impression of you:", [
+  ["A bit intimidating","B.7 F-.5"],
+  ["Approachable","H.7 S.5"],
+  ["Mysterious","S-1 V.3"],
+  ["Energetic","P1 F.5"],
+  ["Quirky","F.7 V.5 O-.3"]]],
+ ["Pick a motto:", [
+  ["Strength in numbers","S1 L-.7"],
+  ["Slow and steady","P-1 O.5"],
+  ["Fortune favours the bold","B1"],
+  ["Work smarter, not harder","V1 H-.3"],
+  ["Take care of each other","H1 S.3"]]]
+];
+
+/* parse "S1 L.5" strings into objects */
+Q.forEach(q => q[1].forEach(o => {
+  const t = {}; (o[1] || "").trim().split(/\s+/).filter(Boolean).forEach(tok => { t[tok[0]] = parseFloat(tok.slice(1)); }); o[1] = t;
+}));
+
+/* Centre each question: the average pull of its five options is removed,
+   so a question set that leans social or kind overall doesn't push everyone the same way. */
+const QMEAN = Q.map(q => { const m = {}; DIMS.forEach(d => m[d] = q[1].reduce((acc, o) => acc + (o[1][d] || 0), 0) / q[1].length); return m; });
+
+const MBTI_TYPES = ["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP","ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP"];
+const MBTI_WEIGHT = 4;      // each MBTI letter counts like four full-strength answers on its trait
+const SHRINK = 2;           // keeps a trait near neutral until several answers point the same way
+const NUDGE = 0.025;        // direct animal nudges are small tie-breakers
+
+function profile(ans, mbti, useMbti = true){
+  const s = {}, n = {}; DIMS.forEach(d => { s[d] = 0; n[d] = 0; });
+  const nudges = {}; Object.keys(A).forEach(k => nudges[k] = 0);
+  ans.forEach((a, i) => {
+    if (a == null) return;
+    const [, t, b] = Q[i][1][a];
+    DIMS.forEach(d => { const v = (t[d] || 0) - QMEAN[i][d]; s[d] += v; n[d] += Math.abs(v); });
+    if (b) for (const k in b) nudges[k] += b[k];
+  });
+  if (useMbti && mbti && mbti.length === 4) {
+    const map = [["S","E","I"],["V","N","S"],["H","F","T"],["O","J","P"]];
+    map.forEach(([d, pos], i) => { s[d] += (mbti[i] === pos ? 1 : -1) * MBTI_WEIGHT; n[d] += MBTI_WEIGHT; });
+  }
+  const u = DIMS.map(d => s[d] / (n[d] + SHRINK));
+  return {u, nudges};
+}
+
+/* Calibration: small per-animal offsets, tuned by simulating thousands of test-takers,
+   so that each of the 16 animals comes out on top about equally often. Used for ranking only. */
+const CAL = {"elephant":0.15,"lion":0.072,"leopard":-0.232,"rhino":-0.106,"buffalo":0.073,"cheetah":-0.139,"giraffe":-0.013,"zebra":0.028,"hippo":0.021,"hyena":0.096,"baboon":0.073,"flamingo":0.03,"wildebeest":0.04,"crocodile":-0.155,"chimpanzee":0.198,"wilddog":0.124};
+
+function rank({u, nudges}){
+  const un = Math.hypot(...u) || 1;
+  return Object.keys(A).map(k => {
+    const p = A[k].p, pn = Math.hypot(...p);
+    const cos = u.reduce((acc, v, i) => acc + v * p[i], 0) / (un * pn);   // shape of personality
+    const dist = Math.sqrt(u.reduce((acc, v, i) => acc + (v - p[i]) ** 2, 0) / DIMS.length) / 2; // 0..1
+    const fit = 0.7 * cos + 0.3 * (1 - 2 * dist) + NUDGE * nudges[k];
+    return {k, fit, adj: fit + CAL[k]};
+  }).sort((a, b) => b.adj - a.adj);
+}
+const pctOf = fit => Math.max(1, Math.min(99, Math.round(50 + 50 * fit)));
+
+/* ---------- state ---------- */
+const KEY = "spirit-quiz-v3";
+const fresh = () => ({step:"intro", i:0, gender:null, mbti:null, ans:Array(Q.length).fill(null)});
+let state = fresh();
+try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && Array.isArray(s.ans) && s.ans.length === Q.length) state = s; } catch(e) {}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {} }
+
+const app = document.getElementById("app");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const g = () => state.gender || "x";
+const pick = (v) => (v && typeof v === "object") ? (v[g()] || v.x) : v;
+const nameOf = k => pick(A[k].name);
+
+function render(){
+  if (state.step === "intro") return renderIntro();
+  if (state.step === "result") return renderResult();
+  renderQuestion();
+}
+
+function renderIntro(){
+  const started = state.ans.some(a => a != null);
+  app.innerHTML = `<section class="card">
+    <h2>Before we head out</h2>
+    <fieldset>
+      <legend>You are</legend>
+      <div class="seg">
+        ${[["m","Male"],["f","Female"],["x","Prefer not to say"]].map(([v,l]) => `<label><input type="radio" name="gender" id="g-${v}" value="${v}" ${state.gender === v ? "checked" : ""}>${l}</label>`).join("")}
+      </div>
+      <p class="small">This only changes how your animal is presented, for example lion or lioness. It never changes which animal you get.</p>
+    </fieldset>
+    <fieldset>
+      <legend>Your MBTI type (optional)</legend>
+      <div class="mbti-grid">
+        ${MBTI_TYPES.map(t => `<label><input type="radio" name="mbti" id="m-${t}" value="${t}" ${state.mbti === t ? "checked" : ""}>${t}</label>`).join("")}
+        <label class="wide"><input type="radio" name="mbti" id="m-none" value="" ${state.mbti === "" ? "checked" : ""}>I don't know / skip</label>
+      </div>
+      <p class="small">If you know it, your type is blended in with your answers on four of the eight traits. Your 40 answers still carry most of the weight.</p>
+    </fieldset>
+    <div class="nav"><span class="small" id="hint"></span><button class="btn primary" id="start">${started ? "Continue" : "Start the test"}</button></div>
+  </section>
+  <section class="card">
+    <h2>The line-up</h2>
+    <ul class="intro-list">${Object.keys(A).map(k => `<li><b>${esc(nameOf(k))}</b><span>${A[k].sw}</span></li>`).join("")}</ul>
+  </section>`;
+  app.querySelectorAll('input[name="gender"]').forEach(r => r.onchange = () => { state.gender = r.value; save(); renderIntro(); });
+  app.querySelectorAll('input[name="mbti"]').forEach(r => r.onchange = () => { state.mbti = r.value; save(); });
+  document.getElementById("start").onclick = () => {
+    if (!state.gender) { document.getElementById("hint").textContent = "Pick an option under \"You are\" to start."; return; }
+    if (state.mbti == null) state.mbti = "";
+    const f = state.ans.findIndex(a => a == null);
+    if (f < 0) state.step = "result"; else { state.step = "q"; state.i = f; }
+    save(); render(); window.scrollTo(0, 0);
+  };
+}
+
+function tracker(){
+  const done = state.ans.filter(a => a != null).length;
+  const p = (state.i / Q.length) * 100;
+  return `<div class="tracker" aria-label="Progress">
+    <div class="track-row"><span>Question ${state.i + 1} of ${Q.length}</span><span>${done} answered</span></div>
+    <div class="track"><div class="trail" style="width:${p}%"></div><div class="paw" style="left:${p}%"></div></div></div>`;
+}
+
+function go(i){
+  if (i < 0) { state.step = "intro"; }
+  else if (i >= Q.length) { state.step = state.ans.every(a => a != null) ? "result" : "q"; if (state.step === "q") state.i = state.ans.findIndex(a => a == null); }
+  else { state.i = i; }
+  save(); render();
+}
+
+function renderQuestion(){
+  const [q, opts] = Q[state.i];
+  const sel = state.ans[state.i];
+  app.innerHTML = tracker() + `<section class="card" aria-live="polite">
+    <div class="qnum">Q${String(state.i + 1).padStart(2, "0")}</div>
+    <h2>${esc(q)}</h2>
+    <div class="opts" role="group" aria-label="Answers">
+      ${opts.map((o, j) => `<button class="opt" id="opt-${j}" data-j="${j}" aria-pressed="${sel === j}"><span class="key">${"ABCDE"[j]}</span><span>${esc(o[0])}</span></button>`).join("")}
+    </div>
+    <div class="nav">
+      <button class="btn ghost" id="back">Back</button>
+      <button class="btn primary" id="next" ${sel == null ? "disabled" : ""}>${state.i === Q.length - 1 ? "See my animal" : "Next"}</button>
+    </div></section>`;
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => { state.ans[state.i] = +b.dataset.j; go(state.i + 1); });
+  document.getElementById("back").onclick = () => go(state.i - 1);
+  document.getElementById("next").onclick = () => { if (state.ans[state.i] != null) go(state.i + 1); };
+}
+
+function traitBars(u, p){
+  return `<div class="traits">${DIMS.map((d, i) => {
+    const [lo, hi] = DIM_LABELS[d];
+    const you = 50 + 50 * u[i], ani = 50 + 50 * p[i];
+    return `<div class="trait"><div class="trait-labels"><span ${u[i] < 0 ? 'style="color:var(--ink)"' : ""}>${lo}</span><span ${u[i] > 0 ? 'style="color:var(--ink)"' : ""}>${hi}</span></div>
+      <div class="axis" role="img" aria-label="${lo} to ${hi}: you ${Math.round(u[i] * 100)}"><span class="dot ani" style="left:${ani}%"></span><span class="dot you" style="left:${you}%"></span></div></div>`;
+  }).join("")}</div>`;
+}
+
+function renderResult(){
+  const prof = profile(state.ans, state.mbti);
+  const r = rank(prof);
+  const k = r[0].k, k2 = r[1].k, a = A[k], b = A[k2];
+  let mbtiNote = "";
+  if (state.mbti) {
+    const without = rank(profile(state.ans, state.mbti, false))[0].k;
+    mbtiNote = without === k
+      ? `Your ${state.mbti} type agreed with your answers: you would be the ${nameOf(k)} either way.`
+      : `Your answers alone pointed to the ${nameOf(without)}; blending in your ${state.mbti} type tipped you to the ${nameOf(k)}.`;
+  }
+  const share = `My savanna spirit animal is the ${nameOf(k)} (${a.sw}): ${pick(a.tag).toLowerCase()}. ${pctOf(r[0].fit)}% match. Runner-up: ${nameOf(k2)}.`;
+  app.innerHTML = `<section class="card result">
+    <div class="result-head">
+      <div class="qnum">Your spirit animal</div>
+      <p class="big-animal">${esc(nameOf(k))}</p>
+      <div class="sw">Swahili: ${a.sw} · ${pctOf(r[0].fit)}% match</div>
+    </div>
+    <p class="tagline">${esc(pick(a.tag))}</p>
+    <p>${esc(pick(a.desc))}</p>
+    <div class="cols">
+      <div><h3>Strengths</h3><ul>${a.good.map(x => `<li>${x}</li>`).join("")}</ul></div>
+      <div><h3>Watch out for</h3><ul>${a.watch.map(x => `<li>${x}</li>`).join("")}</ul></div>
+    </div>
+    ${mbtiNote ? `<p class="mbti-note">${esc(mbtiNote)}</p>` : ""}
+    <div class="meet"><b>Meet your animal in Kenya:</b> ${a.meet}</div>
+    <div class="runner"><b>Runner-up: ${esc(nameOf(k2))} (${b.sw})</b>, ${pick(b.tag).toLowerCase()}. ${esc(pick(b.desc).split(". ")[0])}.</div>
+  </section>
+  <section class="card">
+    <h2>Your trait profile</h2>
+    <div class="legend"><span><i style="background:var(--ochre)"></i>You</span><span><i style="border:2px solid var(--acacia)"></i>${esc(nameOf(k))}</span></div>
+    ${traitBars(prof.u, a.p)}
+  </section>
+  <section class="card">
+    <h2>Your top five</h2>
+    <div class="bars">${r.slice(0, 5).map(x => `<div class="bar-row"><span>${esc(nameOf(x.k))}</span><div class="bar"><i style="width:${pctOf(x.fit)}%"></i></div><span class="pct">${pctOf(x.fit)}%</span></div>`).join("")}</div>
+    <details><summary>How the match works</summary>
+      <p>Every answer moves you along eight personality traits, measured against the average of the five options so no trait is favoured by how the questions are written. Each animal has its own profile on the same eight traits, based on how it actually lives: herd or solitary, sprinter or ambusher, leader or team player. Your match blends how similar the overall shape of your profile is to each animal's with how close the individual traits are. A few answers, like loving water or wanting super speed, give a small extra nudge to specific animals. The scoring is calibrated so all sixteen animals are equally likely outcomes. If you gave an MBTI type, it is added as extra evidence on the Social, Visionary, Heart and Planner traits.</p>
+    </details>
+  </section>
+  <section class="card">
+    <label class="sub" for="share">Share your result</label>
+    <textarea class="share-text" id="share" readonly>${esc(share)}</textarea>
+    <div class="actions">
+      <button class="btn primary" id="copy">Copy result</button>
+      <button class="btn ghost" id="review">Review answers</button>
+      <button class="btn ghost" id="again">Take it again</button>
+    </div>
+  </section>`;
+  document.getElementById("copy").onclick = e => {
+    const t = document.getElementById("share"), btn = e.currentTarget;
+    const fallback = () => { t.select(); btn.textContent = "Selected, copy it"; };
+    try { navigator.clipboard.writeText(t.value).then(() => { btn.textContent = "Copied"; setTimeout(() => btn.textContent = "Copy result", 1600); }, fallback); }
+    catch(err) { fallback(); }
+  };
+  document.getElementById("review").onclick = () => { state.step = "q"; state.i = 0; save(); render(); window.scrollTo(0, 0); };
+  document.getElementById("again").onclick = () => { state = fresh(); save(); render(); window.scrollTo(0, 0); };
+}
+
+document.addEventListener("keydown", e => {
+  if (state.step !== "q") return;
+  const j = "abcde".indexOf(e.key.toLowerCase());
+  if (j >= 0) { const b = document.getElementById("opt-" + j); if (b) b.click(); }
+});
+
+render();
+</script>
+
+</html>
