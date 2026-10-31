@@ -696,12 +696,12 @@ function renderResult(){
       ? `Your result comes entirely from your answers; your MBTI type didn't change it.`
       : `Your answers put the ${nameOf(without)} and the ${nameOf(k)} almost level. Your MBTI type was used as a tie-breaker on traits where your answers were evenly split.`;
   }
-  const share = `My savanna spirit animal is the ${nameOf(k)} (${a.sw}): ${pick(a.tag).toLowerCase()}. ${pctOf(r[0].fit)}% match. Runner-up: ${nameOf(k2)}.`;
+  const share = `My savanna spirit animal is the ${nameOf(k)} (${a.sw}): ${pick(a.tag).toLowerCase()}. ${pctOf(r[0].adj)}% match. Runner-up: ${nameOf(k2)}.`;
   app.innerHTML = `<section class="card result">
     <div class="result-head">
       <div class="qnum">Your spirit animal</div>
       <p class="big-animal">${esc(nameOf(k))}</p>
-      <div class="sw">Swahili: ${a.sw} · ${pctOf(r[0].fit)}% match</div>
+      <div class="sw">Swahili: ${a.sw} · ${pctOf(r[0].adj)}% match</div>
     </div>
     <p class="tagline">${esc(pick(a.tag))}</p>
     <p>${esc(pick(a.desc))}</p>
@@ -720,7 +720,7 @@ function renderResult(){
   </section>
   <section class="card">
     <h2>Your top three</h2>
-    <div class="bars">${r.slice(0, 3).map(x => `<div class="bar-row"><span>${esc(nameOf(x.k))}</span><div class="bar"><i style="width:${pctOf(x.fit)}%"></i></div><span class="pct">${pctOf(x.fit)}%</span></div>`).join("")}</div>
+    <div class="bars">${r.slice(0, 3).map(x => `<div class="bar-row"><span>${esc(nameOf(x.k))}</span><div class="bar"><i style="width:${pctOf(x.adj)}%"></i></div><span class="pct">${pctOf(x.adj)}%</span></div>`).join("")}</div>
     <details><summary>How the match works</summary>
       <p>Every answer moves you along eight personality traits, measured against the average of the five options so no trait is favoured by how the questions are written. Each animal has its own profile on the same eight traits, based on how it actually lives: herd or solitary, sprinter or ambusher, leader or team player. Your match blends how similar the overall shape of your profile is to each animal's with how close the individual traits are. A few answers, like loving water or wanting super speed, give a small extra nudge to specific animals. The scoring is calibrated so all sixteen animals are equally likely outcomes. If you gave an MBTI type, it only acts as a light tie-breaker on the Social, Visionary, Heart and Planner traits, and only where your own answers were evenly split. There is no fixed link between any MBTI type and any animal.</p>
     </details>
